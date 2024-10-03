@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet">
+    <title>Image Upload - Cartoon Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+            background-image: linear-gradient(to right, #ffffff 1px, transparent 1px), 
+                              linear-gradient(to bottom, #ffffff 1px, transparent 1px);
+            background-size: 50px 50px; /* Grid size */
+        }
+        h1 {
+            font-size: 2rem;
+        }
+        #image-preview {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            display: none;
+        }
+        #upload-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                background-size: 25px 25px; /* Smaller grid for mobile */
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            #upload-button {
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Upload Image to Convert into Cartoon/Anime</h1>
+    
+    <input type="file" id="image-upload" accept="image/*">
+    <button id="upload-button" onclick="previewImage()">Upload</button>
+    
+    <div id="image-preview-container">
+        <img id="image-preview" src="" alt="Image Preview">
+    </div>
+    
+    <script>
+        function previewImage() {
+            const fileInput = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('image-preview');
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+    </script>
+
+<form id="upload-form" enctype="multipart/form-data" method="POST">
+    <input type="file" id="image-upload" accept="image/*">
+    <button type="submit">Convert to Anime/Cartoon</button>
+</form>
+<script>
+    document.getElementById('upload-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('image-upload');
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        fetch('/process-image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            document.getElementById('image-preview').src = url;
+            document.getElementById('image-preview').style.display = 'block';
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
+</body>
+</html>
